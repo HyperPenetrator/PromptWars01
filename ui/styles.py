@@ -1,9 +1,9 @@
-\"\"\"
+"""
 Tactical Flow UI Components
 Industrial Utilitarian design system for StadiumFlow AI.
-\"\"\"
+"""
 
-CSS = \"\"\"
+CSS = """
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@700;900&family=Roboto+Mono:wght@500&display=swap');
 
@@ -61,7 +61,7 @@ h2 { font-size: 2rem !important; color: var(--primary); }
 }
 
 /* Sidebar Customization */
-[data-testid=\"stSidebar\"] {
+[data-testid="stSidebar"] {
     background-color: #111111;
     border-right: 2px solid #333;
 }
@@ -86,14 +86,14 @@ h2 { font-size: 2rem !important; color: var(--primary); }
 }
 
 /* Custom Metrics */
-[data-testid=\"stMetricValue\"] {
+[data-testid="stMetricValue"] {
     font-family: 'Roboto Mono', monospace !important;
     font-size: 2.5rem !important;
     color: var(--primary) !important;
 }
 
 </style>
-\"\"\"
+"""
 
 def apply_custom_styles(st):
     st.markdown(CSS, unsafe_allow_html=True)
