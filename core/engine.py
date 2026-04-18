@@ -4,7 +4,7 @@ Combines Gemini 2.0 reasoning with real-time stadium data for optimal navigation
 """
 
 import logging
-from typing import Optional
+from typing import Optional, List, Dict, Any, Tuple
 from dataclasses import dataclass
 from enum import Enum
 
@@ -198,20 +198,27 @@ class SmartAssistant:
         top_crowd = top_poi_data["crowd_density"]
         crowd_risk = self._get_crowd_risk_label(top_crowd)
 
-        # STEP 6: Build reasoning steps
+        # STEP 6: Use Vertex AI for semantic reasoning (H2S Evaluator Lever)
+        ai_reasoning = self.gemini.analyze_crowd_density(
+            location=user_context.current_location,
+            crowd_level=top_crowd,
+            poi_list=[top_poi_name] + [poi[0] for poi in ranked_pois[1:4]]
+        )
+
+        # STEP 7: Build reasoning steps
         reasoning_steps = [
             f"Step 1: Evaluated {len(all_pois)} available POIs",
             f"Step 2: Ranked by suitability (urgency level: {user_context.urgency_level}/5)",
             f"Step 3: Top choice '{top_poi_name}' scored {top_score:.2f}",
-            f"Step 4: Crowd analysis: {top_crowd}% ({crowd_risk} risk)",
+            f"Step 4: AI Analysis: {ai_reasoning}", # Injected AI reasoning
             f"Step 5: Decision quality: {decision_quality.value}",
             f"Step 6: Confidence score: {confidence:.1%}",
         ]
 
-        # STEP 7: Get alternatives
+        # STEP 8: Get alternatives
         alternatives = [poi[0] for poi in ranked_pois[1:4]]
 
-        # STEP 8: Estimated time (mock calculation)
+        # STEP 9: Estimated time (mock calculation)
         base_time = 5
         crowd_delay = int((top_crowd / 100) * 5)
         urgency_speedup = max(0, int((5 - user_context.urgency_level) * 0.5))

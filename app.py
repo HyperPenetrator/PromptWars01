@@ -15,9 +15,19 @@ import logging
 from datetime import datetime
 from typing import Optional
 
-# Configure logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+# Configure Enterprise Logging
+import os
+try:
+    from google.cloud import logging as cloud_logging
+    client = cloud_logging.Client()
+    client.setup_logging()
+    logger = logging.getLogger("stadiumflow")
+    logger.info("✓ Cloud Logging integrated successfully")
+except Exception:
+    # Fallback to standard logging if not in GCP
+    logging.basicConfig(level=logging.INFO)
+    logger = logging.getLogger(__name__)
+    logger.info("✓ Using standard logging fallback")
 
 # Import our custom modules
 from services.gemini_client import GeminiClient
@@ -379,23 +389,16 @@ def main():
 
         try:
             # Initialize services
-            # ACCESSIBILITY: Graceful error handling for missing API keys
             try:
+                # Vertex AI auto-detects project from env
                 gemini = GeminiClient()
-            except ValueError:
-                gemini = None
-                st.warning(
-                    "ℹ️ Note: Gemini API not configured. Using mock reasoning engine. "
-                    "Set GEMINI_API_KEY in .env to enable full reasoning."
-                )
-
-            stadium = StadiumDataProvider()
-
-            # ACCESSIBILITY: Mock client for demo without API key
-            if gemini is None:
+            except Exception as e:
+                logger.warning(f"Vertex AI initialization failed: {e}. Using mock.")
+                # ACCESSIBILITY: Mock client for demo without GCP configuration
                 class MockGemini:
-                    def health_check(self):
-                        return True
+                    def health_check(self): return True
+                    def analyze_crowd_density(self, **kwargs): 
+                        return "Mock analysis: Path looks clear. Protip: Use East gate."
                 gemini = MockGemini()
 
             assistant = SmartAssistant(gemini, stadium)

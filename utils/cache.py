@@ -7,11 +7,13 @@ import json
 import logging
 import os
 from datetime import datetime, timedelta
-from typing import Any, Optional
+from typing import Any, Optional, Dict
 
 logger = logging.getLogger(__name__)
 
-CACHE_DIR = "utils/cache_data"
+# Enterprise Cache Configuration
+# In Cloud Run, /tmp is the only writable directory
+CACHE_DIR = "/tmp/stadiumflow_cache"
 CACHE_EXPIRY_MINUTES = 5  # Cache expires after 5 minutes
 
 
@@ -127,12 +129,12 @@ def cache_clear_all() -> None:
     logger.info("✓ All cache entries cleared")
 
 
-def get_cache_stats() -> dict:
+def get_cache_stats() -> Dict[str, Any]:
     """
-    Get cache statistics.
+    Retrieves performance statistics for the local caching layer.
 
     Returns:
-        Dictionary with cache information.
+        Dict containing entry count, total byte size, and directory path.
     """
     ensure_cache_dir()
     entries = 0
