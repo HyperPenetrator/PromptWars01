@@ -24,6 +24,7 @@ from services.gemini_client import GeminiClient
 from services.maps_mock import StadiumDataProvider
 from core.engine import SmartAssistant, UserContext, DecisionQuality
 from utils.cache import cache_get, cache_set, get_cache_stats
+from ui.styles import apply_custom_styles
 
 # ============================================================================
 # ACCESSIBILITY & DESIGN CONSTANTS
@@ -77,49 +78,8 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# ACCESSIBILITY: Add custom CSS for better contrast and readability
-st.markdown(
-    """
-    <style>
-    /* Accessibility: Ensure minimum contrast ratios (7:1 for WCAG AAA) */
-    h1, h2, h3 {
-        color: #000000;
-        font-weight: 700;
-        margin-top: 1.5rem;
-        margin-bottom: 0.5rem;
-    }
-
-    /* Accessibility: Minimum touch target size (48px recommended) */
-    .stButton > button {
-        min-height: 48px;
-        font-size: 16px;
-        font-weight: 600;
-    }
-
-    /* Accessibility: Focus indicators for keyboard navigation */
-    .stButton > button:focus {
-        outline: 3px solid #0173B2;
-        outline-offset: 2px;
-    }
-
-    /* Accessibility: High contrast text on colored backgrounds */
-    .metric-card {
-        padding: 1.5rem;
-        border-radius: 8px;
-        border: 2px solid #000000;
-    }
-
-    /* Accessibility: Clear visual hierarchy */
-    .status-badge {
-        font-weight: 700;
-        font-size: 16px;
-        padding: 8px 12px;
-        border-radius: 4px;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True,
-)
+# ACCESSIBILITY: Apply Tactical Flow Design System
+apply_custom_styles(st)
 
 init_session_state()
 
@@ -209,46 +169,28 @@ def render_live_status_ticker():
 
 def render_poi_details(poi_name: str, poi_data: dict):
     """
-    Render POI card with accessibility features.
-
-    ACCESSIBILITY: High contrast borders, semantic headings, clear hierarchy.
-
-    Args:
-        poi_name: Name of the POI.
-        poi_data: POI data dictionary.
+    Render POI card with Tactical Flow design.
     """
     crowd = poi_data["crowd_density"]
     poi_type = poi_data["type"]
     status = poi_data["status"]
-    color = get_crowd_color(crowd)
+    color = "#00FF41" if crowd < 50 else "#FFD700" if crowd < 80 else "#FF4B4B"
 
-    # ACCESSIBILITY: Use columns for responsive card layout
-    with st.container():
-        col1, col2, col3 = st.columns([2, 1, 1])
-
-        with col1:
-            st.markdown(f"#### {poi_name}")
-            st.markdown(f"**Type:** {poi_type.title()}")
-
-        with col2:
-            # ACCESSIBILITY: High contrast background + text
-            st.markdown(
-                f'<div style="background-color: {color}; '
-                f'color: #FFFFFF; padding: 12px; '
-                f'border-radius: 4px; font-weight: 700; text-align: center;">'
-                f'{crowd}% Crowd</div>',
-                unsafe_allow_html=True,
-            )
-
-        with col3:
-            status_color = COLORS["optimal"] if status == "open" else COLORS["suboptimal"]
-            st.markdown(
-                f'<div style="background-color: {status_color}; '
-                f'color: #FFFFFF; padding: 12px; '
-                f'border-radius: 4px; font-weight: 700; text-align: center;">'
-                f'{status.title()}</div>',
-                unsafe_allow_html=True,
-            )
+    st.markdown(
+        f'''
+        <div class="data-strip">
+            <div style="flex-grow: 1;">
+                <div style="font-size: 1.2rem; font-weight: 900; color: white;">{poi_name.upper()}</div>
+                <div style="font-size: 0.8rem; color: #888;">{poi_type.upper()} ZONE</div>
+            </div>
+            <div style="text-align: right;">
+                <div style="font-size: 1.5rem; font-weight: 700; color: {color};">{crowd}%</div>
+                <div class="status-badge" style="color: {color};">{status}</div>
+            </div>
+        </div>
+        ''',
+        unsafe_allow_html=True
+    )
 
 
 def render_decision_output(decision):
