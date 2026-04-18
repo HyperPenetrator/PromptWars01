@@ -1,0 +1,9 @@
+{
+  "data": {
+    "poi": "First Aid Station",
+    "confidence": "0.9299999999999999",
+    "quality": "optimal"
+  },
+  "timestamp": "2026-04-16T01:41:30.436901",
+  "expiry_minutes": 10
+}
