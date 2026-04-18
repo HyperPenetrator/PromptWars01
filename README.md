@@ -1,4 +1,4 @@
-# StadiumFlow AI - Agentic Navigation Assistant
+[![Deploy to Cloud Run](https://github.com/HyperPenetrator/PromptWars01/actions/workflows/deploy.yml/badge.svg)](https://github.com/HyperPenetrator/PromptWars01/actions/workflows/deploy.yml)# StadiumFlow AI - Agentic Navigation Assistant
 
 **PromptWars Challenge Submission**  
 **Vertical:** Physical Event Navigation  
